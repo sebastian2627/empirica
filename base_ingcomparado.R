@@ -17,6 +17,7 @@ if(!require(tidyr)) install.packages("tidyr", repos = "http://cran.us.r-project.
 if(!require(car)) install.packages("car", repos = "http://cran.us.r-project.org")
 if(!require(survey)) install.packages("survey", repos = "http://cran.us.r-project.org")
 if(!require(readr)) install.packages("survey", repos = "http://cran.us.r-project.org")
+if(!require(openxlsx)) install.packages("openxlsx", repos = "http://cran.us.r-project.org")
 
 # Cargando datos ------------------------------------------------------------------------------------------
 
@@ -36,9 +37,10 @@ bases <- list(ENEMDU_2015, ENEMDU_2016)
 
 vars <- function(data) {
   return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", 
-                  "periodo", "rama1", "p60a", "p60b", "fexp",
-                  "p60c","p60d","p60e","p60f","p60g","p60h","p60i","p60j","p60k")])
+                  "periodo", "rama1", "p60a", "p60b", "fexp", "ciudad", "rn", "p14","p44f",
+                  "p15","p60c","p60d","p60e","p60f","p60g","p60h","p60i","p60j","p60k")])
 }
+                  
 
 # Aplicar la función a cada base de datos usando lapply
 
@@ -61,6 +63,10 @@ df_enemdu <- ENEMDU_FIN %>%
             'nivel_instruccion'='nnivins',
             'ano' = 'periodo',
             'ciiu' = 'rama1',
+            'idioma'= 'p14',
+            'etnia' = 'p15',
+            'region' = 'rn',
+            'seguro_social' = "p44f",
             "Descontento_ingresos_bajos"= 'p60a',
             'Descontento_muchash_trabajo' = 'p60b',
             'Descontento_horarios' = 'p60c',
@@ -72,14 +78,33 @@ df_enemdu <- ENEMDU_FIN %>%
             'Descontento_actividades' = 'p60i',
             'Descontento_progreso' = 'p60j',
             'Descontento_malas_rel_lab' = 'p60k',
-            "fexp") %>%
+            "fexp","ciudad") %>%
   filter(edad >= 18, edad <= 65, 
          horas_trabajadas > 0, horas_trabajadas < 999,
          experiencia_laboral > 0, experiencia_laboral < 99,
          ingreso_laboral > 0, ingreso_laboral < 999999,
+         idioma %in% c(1:4),
+         etnia %in% c(1:7),
+         region %in% c(1:4),
          estado_civil %in% c(1,6)) %>%
   mutate(Sexo = factor(sexo, levels = c(1:2), labels = c("Hombre", "Mujer")),
          estado_civil = factor(estado_civil, levels = c(1,6), labels = c("Casado", "Soltero")),
+         idioma = factor(idioma, levels = c(1:4), labels = c("indigena",
+                                                             "indigena_espanol",
+                                                             "espanol",
+                                                             "espanol_extranjero")),
+         etnia = factor(etnia, levels = c(1:7), labels = c("indigena",
+                                                           "afroecuatoriano",
+                                                           "negro",
+                                                           "mulato",
+                                                           "montubio",
+                                                           "mestizo",
+                                                           "blanco")),
+         region = factor(region, levels = c(1:4), labels = c("sierra",
+                                                             "costa",
+                                                             "amazonia",
+                                                             "insular")),
+         seguro_social = factor(seguro_social, levels = c(1:2), labels = c(1,0)),
          nivel_instruccion = factor(nivel_instruccion, levels = c(1:5), labels = c("Ninguno",
                                                                                    "Centro de alfabetizacion",
                                                                                    "Básica ",
@@ -120,6 +145,10 @@ df_enemdu <- ENEMDU_FIN %>%
                                   "Otras actividades de servicios" = "19",
                                   "Actividades de los hogares como empleadores; actividades no diferenciadas de los hogares como productores de bienes y servicios para uso propio" = "20",
                                   "Organizaciones internacionales" = "21"))
+
+# Exportar df_enemdu a Excel
+
+write.xlsx(df_enemdu, "df_enemdu.xlsx")
 
 
 
