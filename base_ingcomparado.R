@@ -21,22 +21,52 @@ if(!require(openxlsx)) install.packages("openxlsx", repos = "http://cran.us.r-pr
 
 # Cargando datos ------------------------------------------------------------------------------------------
 
-ENEMDU_2016 <- read_delim("Data/ENEMDU_PERSONAS_2016_12_hom.csv", 
+ENEMDU_2007 <- read_delim("Data/ENEMDU_PERSONAS_2007_12_hom.csv", 
                                           delim = ";", escape_double = FALSE, trim_ws = TRUE)
-View(ENEMDU_PERSONAS_2016_12_hom)
+
+ENEMDU_2008 <- read_delim("Data/ENEMDU_PERSONAS_2008_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2009 <- read_delim("Data/ENEMDU_PERSONAS_2009_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2010 <- read_delim("Data/ENEMDU_PERSONAS_2010_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2011 <- read_delim("Data/ENEMDU_PERSONAS_2011_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2012 <- read_delim("Data/ENEMDU_PERSONAS_2012_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2013 <- read_delim("Data/ENEMDU_PERSONAS_2013_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2014 <- read_delim("Data/ENEMDU_PERSONAS_2014_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
 
 ENEMDU_2015 <- read_delim("Data/ENEMDU_PERSONAS_2015_12_hom.csv", 
+                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2016 <- read_delim("Data/ENEMDU_PERSONAS_2016_12_hom.csv", 
                                           delim = ";", escape_double = FALSE, trim_ws = TRUE)
-View(ENEMDU_PERSONAS_2015_12_hom)
+
+ENEMDU_2017 <- read_delim("Data/ENEMDU_PERSONAS_2017_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+ENEMDU_2018 <- read_delim("Data/ENEMDU_PERSONAS_2018_12_hom.csv", 
+                                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
 
 # Crear una lista de las bases de datos
 
-bases <- list(ENEMDU_2015, ENEMDU_2016)
+bases <- list(ENEMDU_2007, ENEMDU_2008, ENEMDU_2009, ENEMDU_2010, ENEMDU_2011,
+              ENEMDU_2012, ENEMDU_2013, ENEMDU_2014, ENEMDU_2015, ENEMDU_2016,
+              ENEMDU_2017, ENEMDU_2018)
 
 # Definir una función para seleccionar las variables deseadas de las ENEMDU
 
 vars <- function(data) {
-  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", 
+  return(data[, c("p02", "p01", "p03", "p06", "p24", "p45", "ingrl", "nnivins", "p42",
                   "periodo", "rama1", "p60a", "p60b", "fexp", "ciudad", "rn", "p14","p44f",
                   "p15","p60c","p60d","p60e","p60f","p60g","p60h","p60i","p60j","p60k")])
 }
@@ -77,6 +107,7 @@ df_enemdu <- ENEMDU_FIN %>%
             'Descontento_accidente' = 'p60h',
             'Descontento_actividades' = 'p60i',
             'Descontento_progreso' = 'p60j',
+            'grupo_ocupacion' = 'p42',
             'Descontento_malas_rel_lab' = 'p60k',
             "fexp","ciudad") %>%
   filter(edad >= 18, edad <= 65, 
@@ -86,7 +117,8 @@ df_enemdu <- ENEMDU_FIN %>%
          idioma %in% c(1:4),
          etnia %in% c(1:7),
          region %in% c(1:4),
-         estado_civil %in% c(1,6)) %>%
+         estado_civil %in% c(1,6),
+         grupo_ocupacion %in% c(1,2)) %>%
   mutate(Sexo = factor(sexo, levels = c(1:2), labels = c("Hombre", "Mujer")),
          estado_civil = factor(estado_civil, levels = c(1,6), labels = c("Casado", "Soltero")),
          idioma = factor(idioma, levels = c(1:4), labels = c("indigena",
@@ -105,6 +137,7 @@ df_enemdu <- ENEMDU_FIN %>%
                                                              "amazonia",
                                                              "insular")),
          seguro_social = factor(seguro_social, levels = c(1:2), labels = c(1,0)),
+         grupo_ocupacion = factor(grupo_ocupacion, levels = c(1:2), labels = c("publico", "privado")),
          nivel_instruccion = factor(nivel_instruccion, levels = c(1:5), labels = c("Ninguno",
                                                                                    "Centro de alfabetizacion",
                                                                                    "Básica ",
